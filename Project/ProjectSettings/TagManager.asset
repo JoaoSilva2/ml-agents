@@ -30,6 +30,14 @@ TagManager:
   - purpleAgent
   - purpleGoal
   - tile
+  - key
+  - blockLarge
+  - blockSmall
+  - blockVeryLarge
+  - lock
+  - dragon
+  - portal
+  - enemy
   layers:
   - Default
   - TransparentFX
