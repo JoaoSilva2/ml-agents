@@ -16,7 +16,7 @@ public class ShootingAgent : Agent
     int bulletCount = 3;
     int downedEnemies = 0;
     //TODO Make enemyManager that can handle different enemies
-    int enemieCount = 1;
+    public int enemyCount = 0;
 
     public event EventHandler OnEnvironmentReset;
 
@@ -28,9 +28,9 @@ public class ShootingAgent : Agent
     public override void OnEpisodeBegin()
     {
         transform.localPosition = startingPosition;
-        downedEnemies = 0;
-        bulletCount = 3;
+        downedEnemies = 0;        
         OnEnvironmentReset?.Invoke(this, EventArgs.Empty);
+        bulletCount = enemyCount + 2;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -59,18 +59,13 @@ public class ShootingAgent : Agent
         gameObject.GetComponent<Rigidbody>().AddForce(
             new Vector3(
                 directionX * 15f, 0.0f, 0.0f));
-        if(bulletCount == 0)
-        {
-            SetReward(-1.0f);
-            EndEpisode();
-        }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var continuousActionsOut = actionsOut.ContinuousActions;
-        continuousActionsOut[0] = Input.GetAxis("Horizontal");
-        continuousActionsOut[1] = Input.GetKey(KeyCode.Space) ? 1.0f : 0.0f;
+        var continuousActionsOut = actionsOut.DiscreteActions;
+        continuousActionsOut[0] = (int) Input.GetAxis("Horizontal");
+        continuousActionsOut[1] = Input.GetKey(KeyCode.Space) ? 1 : 0;
     }
 
     void Fire()
@@ -80,8 +75,8 @@ public class ShootingAgent : Agent
             return;
         }
 
-        AddReward(-0.1f);
         Rigidbody bulletClone = (Rigidbody) Instantiate(bullet, transform.position, transform.rotation);
+        bulletClone.gameObject.GetComponent<Bullet>().RegisterAgent(this);
         bulletClone.velocity = transform.forward * bulletSpeed;
         currentBullet = bulletClone;
 
@@ -98,13 +93,31 @@ public class ShootingAgent : Agent
         }
     }
 
+    public void Missed()
+    {
+        if (bulletCount == 0)
+        {
+            SetReward(-1.0f);
+            EndEpisode();
+        }
+        else
+        {
+            AddReward(-0.1f / bulletCount);
+        }
+    }
+
     public void RegisterKill()
     {
-        AddReward(1.0f / enemieCount);
+        AddReward(1.0f / enemyCount);
         downedEnemies++;
-        if(downedEnemies == enemieCount)
+        if(downedEnemies == enemyCount)
         {
             SetReward(1f);
+            EndEpisode();
+        }
+        else if (bulletCount == 0)
+        {
+            SetReward(-1.0f);
             EndEpisode();
         }
     }

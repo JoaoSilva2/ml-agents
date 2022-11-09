@@ -4,12 +4,16 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-
-    public ShootingAgent shootingAgent;
+    public ShootingAgent agent;
     // Start is called before the first frame update
     void Start()
     {
         
+    }
+
+    public void RegisterAgent(ShootingAgent agent)
+    {
+        this.agent = agent;
     }
 
     // Update is called once per frame
@@ -22,6 +26,7 @@ public class Bullet : MonoBehaviour
         }
         else if (col.gameObject.CompareTag("max_range"))
         {
+            agent.Missed();
             GameObject.Destroy(gameObject);
         }
     }
