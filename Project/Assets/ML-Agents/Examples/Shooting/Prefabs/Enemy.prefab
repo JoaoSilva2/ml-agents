@@ -127,5 +127,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 127751d63aebd874d9c4972f8e585f8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agent: {fileID: 0}
-  spawnArea: {fileID: 0}
+  enemySpeed: 2

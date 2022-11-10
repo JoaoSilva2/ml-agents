@@ -6,10 +6,10 @@ using System;
 public class Entity : MonoBehaviour
 {
     private Vector3 StartPosition;
-    private EntityManager manager;
+    protected EntityManager manager;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         StartPosition = transform.position;
     }

@@ -40,6 +40,7 @@ TagManager:
   - enemy
   - max_range
   - ally
+  - player_area
   layers:
   - Default
   - TransparentFX

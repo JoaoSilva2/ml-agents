@@ -16,7 +16,7 @@ public class Bullet : MonoBehaviour
         this.agent = agent;
     }
 
-    // Update is called once per frame
+
     void OnCollisionEnter(Collision col)
     {
         if (col.gameObject.CompareTag("enemy"))

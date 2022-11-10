@@ -20,7 +20,7 @@ public class ShootingAgent : Agent
     public int enemyCount = 0;
     public int allyCount = 0;
 
-    public float shootCooldown = 0.5f;
+    public float shootCooldown = 0.3f;
     public bool onCooldown = false;
     public float counter = 0.0f;
 
@@ -35,7 +35,15 @@ public class ShootingAgent : Agent
     {
         transform.localPosition = startingPosition;
         downedEnemies = 0;  
-        downedAllies = 0;      
+        downedAllies = 0;
+        onCooldown = false;
+        if(currentBullet != null)
+        {
+            GameObject.Destroy(currentBullet.gameObject);
+        }
+        currentBullet = null;
+        canShoot = true;
+        counter = 0.0f;
         OnEnvironmentReset?.Invoke(this, EventArgs.Empty);
         bulletCount = enemyCount + 2;
     }
@@ -44,8 +52,9 @@ public class ShootingAgent : Agent
     {
         sensor.AddObservation(this.transform.localPosition);
         sensor.AddObservation(rBody.velocity.x);
-        sensor.AddObservation(canShoot);
+        //sensor.AddObservation(canShoot); //uncomment this for other models
         sensor.AddObservation(bulletCount);
+        sensor.AddObservation(enemyCount - downedEnemies); //uncomment this for moving enemies
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
@@ -119,6 +128,12 @@ public class ShootingAgent : Agent
         {
             AddReward(-0.05f / bulletCount);
         }
+    }
+
+    public void GameOver()
+    {
+        SetReward(-1);
+        EndEpisode();
     }
 
     public void RegisterKill(String tag)

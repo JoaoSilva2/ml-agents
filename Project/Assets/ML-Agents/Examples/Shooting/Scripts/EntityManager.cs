@@ -28,6 +28,11 @@ public class EntityManager : MonoBehaviour
         agent.RegisterKill(en.tag);
     }
 
+    public void ReachedPlayer()
+    {
+        agent.GameOver();
+    }
+
     void RespawnEntities(object sender, EventArgs e)
     {
         bool enemy = false;
