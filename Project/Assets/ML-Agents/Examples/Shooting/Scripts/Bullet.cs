@@ -24,6 +24,11 @@ public class Bullet : MonoBehaviour
             col.gameObject.GetComponent<Enemy>().Die();
             GameObject.Destroy(gameObject);
         }
+        else if (col.gameObject.CompareTag("ally"))
+        {
+            col.gameObject.GetComponent<Ally>().Die();
+            GameObject.Destroy(gameObject);
+        }
         else if (col.gameObject.CompareTag("max_range"))
         {
             agent.Missed();

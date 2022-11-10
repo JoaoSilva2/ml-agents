@@ -15,8 +15,14 @@ public class ShootingAgent : Agent
     bool canShoot = true;
     int bulletCount = 3;
     int downedEnemies = 0;
-    //TODO Make enemyManager that can handle different enemies
+    int downedAllies = 0;
+
     public int enemyCount = 0;
+    public int allyCount = 0;
+
+    public float shootCooldown = 0.5f;
+    public bool onCooldown = false;
+    public float counter = 0.0f;
 
     public event EventHandler OnEnvironmentReset;
 
@@ -28,7 +34,8 @@ public class ShootingAgent : Agent
     public override void OnEpisodeBegin()
     {
         transform.localPosition = startingPosition;
-        downedEnemies = 0;        
+        downedEnemies = 0;  
+        downedAllies = 0;      
         OnEnvironmentReset?.Invoke(this, EventArgs.Empty);
         bulletCount = enemyCount + 2;
     }
@@ -87,14 +94,22 @@ public class ShootingAgent : Agent
 
     private void FixedUpdate()
     {
-        if(currentBullet == null)
+        if(onCooldown)
         {
-            canShoot = true;
+            counter += Time.deltaTime;
+            if(counter >= shootCooldown)
+            {
+                counter = 0.0f;
+                canShoot = true;
+                currentBullet = null;
+                onCooldown = false;
+            }
         }
     }
 
     public void Missed()
     {
+        onCooldown = true;
         if (bulletCount == 0)
         {
             SetReward(-1.0f);
@@ -102,20 +117,34 @@ public class ShootingAgent : Agent
         }
         else
         {
-            AddReward(-0.1f / bulletCount);
+            AddReward(-0.05f / bulletCount);
         }
     }
 
-    public void RegisterKill()
+    public void RegisterKill(String tag)
     {
-        AddReward(1.0f / enemyCount);
-        downedEnemies++;
-        if(downedEnemies == enemyCount)
+        onCooldown = true;
+        if(tag.Equals("enemy"))
         {
-            SetReward(1f);
-            EndEpisode();
+            AddReward(1.0f / enemyCount - 0.001f);
+            downedEnemies++;
+            if(downedEnemies == enemyCount)
+            {
+                SetReward(1f);
+                EndEpisode();
+            }
         }
-        else if (bulletCount == 0)
+        else {
+            AddReward(-0.3f / allyCount);
+            downedAllies++;
+            if(downedAllies == allyCount)
+            {
+                SetReward(-1f);
+                EndEpisode();
+            }
+        }
+
+        if (bulletCount == 0)
         {
             SetReward(-1.0f);
             EndEpisode();

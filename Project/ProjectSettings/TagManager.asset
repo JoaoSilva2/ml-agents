@@ -38,6 +38,8 @@ TagManager:
   - dragon
   - portal
   - enemy
+  - max_range
+  - ally
   layers:
   - Default
   - TransparentFX

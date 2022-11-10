@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Enemy : Entity
+public class Ally : Entity
 {
-   
+
 }
